@@ -1,0 +1,26 @@
+/* pages/learn/learn.wxss */
+
+
+.avatar-wrapper {
+    background-color: rosybrown;
+}
+
+.avatar {
+    width: 120rpx;
+    height: 120rpx;
+}
+
+.left-nickname {
+    font-weight: 800;
+    padding-left: 40rpx;
+    font-size: 30rpx;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.weui-input {
+    text-align: center;
+    margin-top: 60rpx;
+    font-size: 30rpx;
+    color: black;
+    display: inline-flex;
+}

@@ -1,0 +1,9 @@
+<!--pages/learn/learn.wxml-->
+
+<button class="avatar-wrapper" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
+    <image class="avatar" src="{{avatarUrl}}"></image>
+</button>
+<div>
+    <text class="left-nickname"> 昵称 </text>
+    <input type="nickname" class="weui-input" placeholder="请输入昵称" />
+</div>

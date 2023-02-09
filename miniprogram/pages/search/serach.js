@@ -1,4 +1,4 @@
-// pages/index/index.js
+// pages/search/serach.js
 Page({
 
     /**

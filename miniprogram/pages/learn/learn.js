@@ -1,18 +1,32 @@
-// pages/index/index.js
+// pages/learn/learn.js
+
+const defaultAvatarUrl = 'https://mmbiz.qpic.cn/mmbiz/icTdbqWNOwNRna42FI242Lcia07jQodd2FJGIYQfG0LAJGFxM4FbnQP6yfMxBgJ0F3YRqJCJ1aPAK2dQagdusBZg/0'
+
 Page({
 
     /**
      * Page initial data
      */
     data: {
-
+        userInfo: {},
     },
 
     /**
      * Lifecycle function--Called when page load
      */
-    onLoad(options) {
 
+    onLoad: function () {},
+
+    data: {
+        avatarUrl: defaultAvatarUrl,
+    },
+    onChooseAvatar(e) {
+        const {
+            avatarUrl
+        } = e.detail
+        this.setData({
+            avatarUrl,
+        })
     },
 
     /**
