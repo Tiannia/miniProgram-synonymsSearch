@@ -1,2 +1,40 @@
 <!--pages/index/index.wxml-->
-<text>pages/index/index.wxml</text>
+
+<!-- 用户信息 -->
+<view class="user">
+    <button style="width:500rpx; height:180rpx; margin:0rpx; padding:0rpx;" open-type="getUserInfo" bindgetuserinfo="onGetUserInfo" hover-class="none">
+        <view class="userinfo">
+            <image class="userinfo-avatar" src="{{avatarUrl}}" mode="scaleToFill"></image>
+            <view class="userinfo-nickname">{{nickName}}</view>
+        </view>
+    </button>
+    <view class="management" bindtap="management">管理员入口</view>
+</view>
+
+<!-- 搜索 -->
+<view class="area" style="display:flex; flex-direction:row; justify-content:space-around; align-items:center;">
+    <input class="search_input" placeholder="输入词语..." bindinput="bindKeyInput"> </input>
+    <image class="search_img" src="/images/search.png" bindtap="search"> </image>
+</view>
+
+<!-- 热词 -->
+<view class="area">
+    <view class="area-title">
+        <text class="title">最新热词</text>
+    </view>
+    <view class="word-line" wx:for="{{hot_words}}" wx:key="index" wx:for-index="idx" wx:for-item="itemName" style='{{idx == hot_words.length-1 ? "": "border-bottom:4rpx solid #437dd4;"}}'>
+        <view class="word-content">
+            <view class="word-txt">{{itemName.word}}</view>
+            <view class="word-hot">{{itemName.hot}}</view>
+        </view>
+        <image class="word-img" src="/images/hot.png"></image>
+    </view>
+</view>
+
+<view class="bottom-line">
+    <view class="bottom-txt">-- 当前词库已收录17,720词 --</view>
+    <view class="bottom-button">
+        <button class="bottom-click" size="mini" style="width:300rpx; height:60rpx; margin: 0rpx; padding:0rpx; font-size: 30rpx;" bindtap="feedback">联系与反馈</button>
+        <button class="bottom-click" size="mini" style="width:300rpx; height:60rpx; margin: 0rpx; padding:0rpx; font-size: 30rpx;" open-type="share">分享给好友</button>
+    </view>
+</view>

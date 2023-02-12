@@ -55,5 +55,6 @@
             ]
         }
     },
-    "projectname": "SynonymsSearch"
+    "projectname": "SynonymsSearch",
+    "libVersion": "2.14.1"
 }

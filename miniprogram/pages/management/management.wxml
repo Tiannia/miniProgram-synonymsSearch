@@ -1,2 +1,30 @@
 <!--pages/management/management.wxml-->
-<text>pages/management/management.wxml</text>
+
+<view class="feedback-wrapper" wx:for="{{feedbacks}}" wx:for-item="itemName" wx:for-index="idx">
+    <view class="item-title">{{itemName.content}}</view>
+    <view class="item-title"><text style="font-weight: 700;">微信号：</text>{{itemName.wechat_account}}</view>
+    <view class="item-title"><text style="font-weight: 700;">邮箱：</text>{{itemName.email}}</view>
+    <image wx:if="{{itemName.picture_url != ''}}" class="item-picture" mode="widthFix" src="{{itemName.picture_url}}"></image>
+    <view class="info-line">
+        <block wx:if="{{itemName.type == 1}}">
+            <view class="info-type" style="background-color: #1dd1a1;">增加词语</view>
+        </block>
+        <block wx:elif="{{itemName.type == 2}}">
+            <view class="info-type" style="background-color: #ff9f43;">加入我们</view>
+        </block>
+        <block wx:elif="{{itemName.type == 3}}">
+            <view class="info-type" style="background-color: #f368e0;">商务合作</view>
+        </block>
+        <block wx:elif="{{itemName.type == 4}}">
+            <view class="info-type" style="background-color: #48dbfb;">其他</view>
+        </block>
+        <block wx:elif="{{itemName.type == 5}}">
+            <view class="info-type" style="background-color: #5f27cd;">BUG反馈</view>
+        </block>
+        <block wx:else>
+            <view class="info-type" style="background-color: #777777;">Unknown Type</view>
+        </block>
+        <view class="info-time">2020-8-30</view>
+        <view class="info-type" style="background-color: #ee5253;" bindtap="del" id="{{itemName.id}}" data-idx="{{idx}}">删除</view>
+    </view>
+</view>

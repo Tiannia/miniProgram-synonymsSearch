@@ -1,7 +1,7 @@
 {
   "pages": [
       "pages/index/index",
-      "pages/search/serach",
+      "pages/search/search",
       "pages/feedback/feedback",
       "pages/management/management"
   ],
