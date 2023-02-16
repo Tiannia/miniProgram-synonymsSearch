@@ -1,0 +1,26 @@
+[
+  {
+    "name": "删除反馈",
+    "value": {
+      "feedback_id": "37e26adb5ebed07300d15a0a61732204"
+    }
+  },
+  {
+    "name": "新增反馈",
+    "value": {
+      "nickName": "李四",
+      "content": "我发现这里有一个大bug",
+      "wechat_account": "shijianfeng",
+      "email": "shijianfeng@xxx.com",
+      "type": 4,
+      "picture_url": "xxxx"
+    }
+  },
+  {
+    "name": "搜索近义词",
+    "value": {
+      "query_word": "取消",
+      "query_type": 1
+    }
+  }
+]
