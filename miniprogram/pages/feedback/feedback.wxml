@@ -21,7 +21,7 @@
 
 <view class="line-block" style="flex-direction:column;">
     <view class="upload-txt" bindtap="doUpload">上传BUG截图（可选）</view>
-    <image class="upload-image" mode='widthFix' wx:if="{{isShowPic}}" src="{{fileID}}"></image>
+    <image class="upload-image" mode="widthFix" wx:if="{{isShowPic}}" src="{{fileID}}"></image>
 </view>
 
 <view class="line-button">

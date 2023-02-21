@@ -1,6 +1,6 @@
 <!--pages/management/management.wxml-->
 
-<view class="feedback-wrapper" wx:for="{{feedbacks}}" wx:for-item="itemName" wx:for-index="idx">
+<view class="feedback-wrapper" wx:for="{{feedbacks}}" wx:key="_id" wx:for-item="itemName" wx:for-index="idx">
     <view class="item-title">{{itemName.content}}</view>
     <view class="item-title"><text style="font-weight: 700;">微信号：</text>{{itemName.wechat_account}}</view>
     <view class="item-title"><text style="font-weight: 700;">邮箱：</text>{{itemName.email}}</view>
@@ -24,7 +24,7 @@
         <block wx:else>
             <view class="info-type" style="background-color: #777777;">Unknown Type</view>
         </block>
-        <view class="info-time">2020-8-30</view>
-        <view class="info-type" style="background-color: #ee5253;" bindtap="del" id="{{itemName.id}}" data-idx="{{idx}}">删除</view>
+        <view class="info-time">{{itemName.create_date_time}}</view>
+        <view class="info-type" style="background-color: #ee5253;" bindtap="del" id="{{itemName._id}}" data-idx="{{idx}}">删除</view>
     </view>
 </view>

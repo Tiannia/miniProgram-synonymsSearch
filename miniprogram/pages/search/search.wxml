@@ -5,11 +5,11 @@
     <image class="search_img" src="/images/search.png" bindtap="search"></image>
 </view>
 
-<view class="area" wx:if="{{similar_words.length!=0}}">
+<view class="area" wx:if="{{dataExist}}">
     <view class="area-title">
         <text class="title">搜索结果</text>
     </view>
-    <view class="word-line" wx:for="{{similar_words}}" wx:key="index" wx:for-index="idx" wx:for-item="itemName" style='{{idx == similar_words.length-1 ? "" : "border-bottom : 4rpx solid #437dd4;" }}'>
+    <view class="word-line" wx:for="{{similar_words}}" wx:key="id" wx:for-index="idx" wx:for-item="itemName" style='{{idx == similar_words.length-1 ? "" : "border-bottom : 4rpx solid #437dd4;" }}'>
         <view class="word-content">
             <view class="word-txt">{{itemName.word_name==search_word?itemName.similar_word_name:itemName.word_name}}</view>
             <view class="word-hot">{{itemName.correlation}}</view>

@@ -15,7 +15,9 @@ App({
     }
 
     this.globalData = {
-        
+        logged: false,
+        userInfo: {},
+        user: {}, // 服务器返回的用户信息
     };
   }
 });

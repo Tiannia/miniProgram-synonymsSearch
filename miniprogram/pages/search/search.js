@@ -1,4 +1,8 @@
 // pages/search/search.js
+
+// 获取应用实例
+const app = getApp()
+
 Page({
 
     /**
@@ -6,42 +10,8 @@ Page({
      */
     data: {
         search_word: "",
-        similar_words: [{
-                id: 1,
-                correlation: 12,
-                similar_word_name: "作废",
-                word_name: "取消",
-                isClick: false
-            },
-            {
-                id: 2,
-                correlation: 8,
-                similar_word_name: "取消",
-                word_name: "取缔",
-                isClick: false
-            },
-            {
-                id: 3,
-                correlation: 7,
-                similar_word_name: "打消",
-                word_name: "取消",
-                isClick: false
-            },
-            {
-                id: 4,
-                correlation: 2,
-                similar_word_name: "勾销",
-                word_name: "取消",
-                isClick: false
-            },
-            {
-                id: 5,
-                correlation: 0,
-                similar_word_name: "取消",
-                word_name: "取销",
-                isClick: false
-            }
-        ]
+        similar_words: [],
+        dataExist: true
     },
 
     showModal(title, content) {
@@ -64,16 +34,38 @@ Page({
         console.log(e)
         var id = e.target.id
         var idx = e.target.dataset.idx
-        console.log("id:" + id + ",idx:" + idx)
+        console.log("id:" + id + ", idx:" + idx)
         if (this.data.similar_words[idx].isClick) {
             this.showModal('提示', '您已经点过赞了！')
 
         } else {
-            var tmp_click = "similar_words[" + idx + "].isClick"
-            var tmp_correlation = "similar_words[" + idx + "].correlation"
-            this.setData({
-                [tmp_click]: true,
-                [tmp_correlation]: (this.data.similar_words[idx].correlation + 1)
+            var that = this
+            wx.cloud.callFunction({
+                name: 'add_words_correlation',
+                data: {
+                    relation_id: id
+                },
+                success: res => {
+                    console.log(res)
+                    if (res.result.errCode == 0) {
+                        console.log('服务器返回请求成功')
+                        var new_relation = res.result.data.relation
+                        new_relation.isClick = 1
+
+                        var tmp_similar_word = "similar_words[" + idx + "]"
+                        that.setData({
+                            [tmp_similar_word]: new_relation
+                        })
+
+                    } else {
+                        console.log('服务器返回请求不成功，出现某种问题，需要处理')
+                        that.showModal('抱歉，出现错误', res.result.errMsg)
+                    }
+                },
+                fail: err => {
+                    console.error('[云函数] [add_words_correlation] 调用失败', err)
+                    that.showModal('调用失败', '请检查云函数是否已部署')
+                }
             })
             this.showModal('恭喜', '点赞成功！')
         }
@@ -94,7 +86,40 @@ Page({
     },
 
     search(e) {
-
+        // 调用云函数
+        var that = this
+        wx.cloud.callFunction({
+            name: 'query_similar_words',
+            data: {
+                query_word: that.data.search_word,
+                query_type: 1
+            },
+            success: res => {
+                console.log(res)
+                if (res.result.errCode == 0) {
+                    console.log('服务器返回请求成功')
+                    that.setData({
+                        similar_words: res.result.data.word.similar_words,
+                        dataExist: true
+                    })
+                } else {
+                    // console.log('服务器返回请求不成功，出现某种问题，需要处理')
+                    if (res.result.errCode == 3 || res.result.errCode == 4) {
+                        that.setData({
+                            dataExist: false
+                        })
+                    }
+                    that.setData({
+                        similar_words: []
+                    })
+                    that.showModal('抱歉，出现错误', res.result.errMsg)
+                }
+            },
+            fail: err => {
+                console.error('[云函数] [query_similar_words] 调用失败', err)
+                that.showModal('调用失败', '请检查云函数是否已部署')
+            }
+        })
     },
 
     /**
@@ -110,6 +135,10 @@ Page({
             that.setData({
                 search_word: data.search_word
             })
+
+            if (data.search_word != "" || data.search_word != undefined) {
+                that.search()
+            }
         })
     },
 

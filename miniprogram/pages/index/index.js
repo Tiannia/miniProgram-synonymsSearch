@@ -11,29 +11,10 @@ Page({
         nickName: "点击登录",
         avatarUrl: "/images/user-unlogin.png",
         userInfo: {},
-        logged: false,
         search_word: "",
-        hot_words: [{
-                id: 1,
-                word: "取消",
-                hot: 30
-            },
-            {
-                id: 5,
-                word: "热爱",
-                hot: 14
-            },
-            {
-                id: 9,
-                word: "学习",
-                hot: 9
-            },
-            {
-                id: 6,
-                word: "模仿",
-                hot: 1
-            }
-        ],
+        hot_words: [],
+        is_admin: false,
+        user: {},
     },
 
     showModal(title, content) {
@@ -53,7 +34,7 @@ Page({
     },
 
     management() {
-        if (!this.data.logged) {
+        if (!app.globalData.logged) {
             this.showModal('提示', '请先登录！')
         } else {
             wx.navigateTo({
@@ -70,8 +51,14 @@ Page({
         })
     },
 
+    hotword(e) {
+        console.log(e)
+        this.data.search_word = e.currentTarget.dataset.word
+        this.search()
+    },
+
     search(e) {
-        if (!this.data.logged) {
+        if (!app.globalData.logged) {
             this.showModal('提示', '请先登录！')
         } else if (this.data.search_word == "") {
             this.showModal('提示', '请输入要查询的词语！')
@@ -90,7 +77,7 @@ Page({
     },
 
     feedback(e) {
-        if (!this.data.logged) {
+        if (!app.globalData.logged) {
             this.showModal('提示', '请先登录！')
         } else {
             wx.navigateTo({
@@ -116,7 +103,6 @@ Page({
                     wx.getUserInfo({
                         success: res => {
                             this.setData({
-                                logged: true,
                                 nickName: res.userInfo.nickName,
                                 avatarUrl: res.userInfo.avatarUrl,
                                 userInfo: res.userInfo
@@ -131,9 +117,8 @@ Page({
     },
 
     onGetUserInfo(e) {
-        if (!this.data.logged && e.detail.userInfo) {
+        if (!app.globalData.logged && e.detail.userInfo) {
             this.setData({
-                logged: true,
                 userInfo: e.detail.userInfo,
                 nickName: e.detail.userInfo.nickName,
                 avatarUrl: e.detail.userInfo.avatarUrl,
@@ -145,23 +130,34 @@ Page({
 
     onGetOpenid() {
         // 调用云函数
-        // wx.cloud.callFunction({
-        //   name: 'login',
-        //   data: {},
-        //   success: res => {
-        //     console.log('[云函数] [login] user openid: ', res.result.openid)
-        //     app.globalData.openid = res.result.openid
-        //     wx.navigateTo({
-        //       url: '../userConsole/userConsole',
-        //     })
-        //   },
-        //   fail: err => {
-        //     console.error('[云函数] [login] 调用失败', err)
-        //     wx.navigateTo({
-        //       url: '../deployFunctions/deployFunctions',
-        //     })
-        //   }
-        // })
+        var that = this
+        wx.cloud.callFunction({
+            name: 'wechat_sign',
+            data: {
+                avatarUrl: that.data.avatarUrl,
+                gender: that.data.userInfo.gender,
+                nickName: that.data.nickName
+            },
+            success: res => {
+                console.log(res)
+                if (res.result.errCode == 0) {
+                    console.log('服务器返回请求成功')
+                    that.setData({
+                        is_admin: res.result.data.user.is_admin
+                    })
+                    that.data.user = res.result.data.user
+                    app.globalData.user = res.result.data.user
+                    app.globalData.logged = true
+                } else {
+                    // console.log('服务器返回请求不成功，出现某种问题，需要处理')
+                    that.showModal('抱歉，出现错误', res.result.errMsg)
+                }
+            },
+            fail: err => {
+                console.error('[云函数] [wechat_sign] 调用失败', err)
+                that.showModal('调用失败', '请检查云函数是否已部署')
+            }
+        })
     },
 
     /**
@@ -175,7 +171,28 @@ Page({
      * Lifecycle function--Called when page show
      */
     onShow() {
-
+        // 调用云函数
+        var that = this
+        wx.cloud.callFunction({
+            name: 'get_hot_words',
+            data: {},
+            success: res => {
+                console.log(res)
+                if (res.result.errCode == 0) {
+                    console.log('服务器返回请求成功')
+                    that.setData({
+                        hot_words: res.result.data.hot_words
+                    })
+                } else {
+                    // console.log('服务器返回请求不成功，出现某种问题，需要处理')
+                    that.showModal('抱歉，出现错误', res.result.errMsg)
+                }
+            },
+            fail: err => {
+                console.error('[云函数] [get_hot_words] 调用失败', err)
+                that.showModal('调用失败', '请检查云函数是否已部署')
+            }
+        })
     },
 
     /**

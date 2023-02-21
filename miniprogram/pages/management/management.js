@@ -1,52 +1,35 @@
 // pages/management/management.js
+
+// 获取应用实例
+const app = getApp()
+
 Page({
 
     /**
      * Page initial data
      */
     data: {
-        feedbacks: [{
-                id: 1,
-                content: "我发现这里有一个大bug我发现这里有一个大bug我发现这里有一个大bug我发现这里有一个大bug我发现这里有一个大bug",
-                type: 5,
-                wechat_account: "shijianfeng",
-                email: "shijianfeng@xxx.com",
-                picture_url: "/images/search.png",
-                create_date_time: "2020-5-15 16:32"
-            },
-            {
-                id: 2,
-                content: "这是一个bug",
-                type: 4,
-                wechat_account: "shijianfeng",
-                email: "shijianfeng@xxx.com",
-                picture_url: "",
-                create_date_time: "2020-5-15 16:32"
-            },
-            {
-                id: 3,
-                content: "Lalala",
-                type: 2,
-                wechat_account: "",
-                email: "",
-                picture_url: "/images/search.png",
-                create_date_time: "2020-5-15 16:32"
-            },
-            {
-                id: 4,
-                content: "建议加入词语新兴",
-                type: 1,
-                wechat_account: "",
-                email: "",
-                picture_url: "",
-                create_date_time: "2020-5-15 16:32"
+        feedbacks: []
+    },
+
+    showModal(title, content) {
+        wx.showModal({
+            title: title,
+            content: content,
+            confirmText: "我知道了",
+            showCancel: false,
+            success(res) {
+                if (res.confirm) {
+                    console.log('用户点击确定')
+                } else if (res.cancel) {
+                    console.log('用户点击取消')
+                }
             }
-        ]
+        })
     },
 
     del(e) {
         var that = this
-
         console.log(e)
         var id = e.target.id
         var idx = e.target.dataset.idx
@@ -58,28 +41,38 @@ Page({
             success(res) {
                 if (res.confirm) {
                     console.log('用户点击确定')
+                    // 调用云函数
+                    wx.cloud.callFunction({
+                        name: 'remove_feedback',
+                        data: {
+                            feedback_id: id,
+                        },
+                        success: res => {
+                            console.log(res)
+                            if (res.result.errCode == 0) {
+                                console.log('服务器返回请求成功')
 
-                    var tmp = that.data.feedbacks
-                    tmp.splice(idx, 1)
-                    console.log(tmp)
+                                // TODO：实时更新，可能存在多个管理员
+                                var tmp = that.data.feedbacks
+                                tmp.splice(idx, 1)
+                                console.log(tmp)
 
-                    that.setData({
-                        feedbacks: tmp
-                    })
+                                that.setData({
+                                    feedbacks: tmp
+                                })
+                                that.showModal('提示', '删除成功')
 
-                    wx.showModal({
-                        title: '提示',
-                        content: '删除成功',
-                        confirmText: "我知道了",
-                        showCancel: false,
-                        success(res) {
-                            if (res.confirm) {
-                                console.log('用户点击确定')
-                            } else if (res.cancel) {
-                                console.log('用户点击取消')
+                            } else {
+                                // console.log('服务器返回请求不成功，出现某种问题，需要处理')
+                                that.showModal('抱歉，出现错误', res.result.errMsg)
                             }
+                        },
+                        fail: err => {
+                            console.error('[云函数] [remove_feedback] 调用失败', err)
+                            that.showModal('调用失败', '请检查云函数是否已部署')
                         }
                     })
+
                 } else if (res.cancel) {
                     console.log('用户点击取消')
                 }
@@ -87,13 +80,34 @@ Page({
         })
     },
 
-
-
     /**
      * Lifecycle function--Called when page load
      */
     onLoad(options) {
-
+        // 禁用分享
+        wx.hideShareMenu()
+        // 调用云函数
+        var that = this
+        wx.cloud.callFunction({
+            name: 'get_feedbacks',
+            data: {},
+            success: res => {
+                console.log(res)
+                if (res.result.errCode == 0) {
+                    console.log('服务器返回请求成功')
+                    that.setData({
+                        feedbacks: res.result.data.feedbacks
+                    })
+                } else {
+                    // console.log('服务器返回请求不成功，出现某种问题，需要处理')
+                    that.showModal('抱歉，出现错误', res.result.errMsg)
+                }
+            },
+            fail: err => {
+                console.error('[云函数] [get_feedbacks] 调用失败', err)
+                that.showModal('调用失败', '请检查云函数是否已部署')
+            }
+        })
     },
 
     /**

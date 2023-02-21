@@ -8,12 +8,12 @@
             <view class="userinfo-nickname">{{nickName}}</view>
         </view>
     </button>
-    <view class="management" bindtap="management">管理员入口</view>
+    <view class="management" bindtap="management" wx:if="{{is_admin}}">管理员入口</view>
 </view>
 
 <!-- 搜索 -->
 <view class="area" style="display:flex; flex-direction:row; justify-content:space-around; align-items:center;">
-    <input class="search_input" placeholder="输入词语..." bindinput="bindKeyInput"> </input>
+    <input class="search_input" placeholder="输入词语..." bindinput="bindKeyInput" value="{{search_word}}"> </input>
     <image class="search_img" src="/images/search.png" bindtap="search"> </image>
 </view>
 
@@ -22,7 +22,7 @@
     <view class="area-title">
         <text class="title">最新热词</text>
     </view>
-    <view class="word-line" wx:for="{{hot_words}}" wx:key="index" wx:for-index="idx" wx:for-item="itemName" style='{{idx == hot_words.length-1 ? "": "border-bottom:4rpx solid #437dd4;"}}'>
+    <view class="word-line" wx:for="{{hot_words}}" wx:key="id" wx:for-index="idx" wx:for-item="itemName" style='{{idx == hot_words.length-1 ? "": "border-bottom:4rpx solid #437dd4;"}}' data-word="{{itemName.word}}"bindtap="hotword">
         <view class="word-content">
             <view class="word-txt">{{itemName.word}}</view>
             <view class="word-hot">{{itemName.hot}}</view>

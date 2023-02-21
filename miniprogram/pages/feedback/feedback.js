@@ -1,4 +1,7 @@
 // pages/feedback/feedback.js
+
+const app = getApp()
+
 Page({
 
     /**
@@ -12,7 +15,8 @@ Page({
         email: "",
         isShowPic: false,
         fileID: "",
-        cloudPath: ""
+        cloudPath: "",
+        template: "",
     },
 
     showModal(title, content) {
@@ -35,11 +39,71 @@ Page({
         if (this.data.content == "") {
             this.showModal('提示', '请输入反馈内容！')
         } else {
-            this.showModal('提示', '反馈成功！')
-            this.setData({
-                content: "",
-                wechatNo: "",
-                email: "",
+            // requestSubscribeMessage
+            var that = this
+            wx.requestSubscribeMessage({
+                tmplIds: [that.data.template],
+                success: res => {
+                    if (res[that.data.template] === 'accept') {
+                        console.log('成功')
+                    } else {
+                        console.log(`失败（${res[that.data.template]}）`)
+                    }
+                },
+                fail: err => {
+                    console.log(`失败（${JSON.stringify(err)}）`)
+                },
+                complete: () => {
+                    // 调用云函数
+                    wx.cloud.callFunction({
+                        name: 'add_feedback',
+                        data: {
+                            nickName: app.globalData.userInfo.nickName,
+                            content: that.data.content,
+                            wechat_account: that.data.wechatNo,
+                            email: that.data.email,
+                            type: Number(that.data.index) + 1,
+                            picture_url: that.data.fileID
+                        },
+                        success: res => {
+                            console.log(res)
+                            // 删除了部分 console.log 调试信息
+                            if (res.result.errCode == 0) {
+                                wx.showModal({
+                                    title: '提示',
+                                    content: '反馈成功！',
+                                    confirmText: "我知道了",
+                                    showCancel: false,
+                                    success(res) {
+                                        if (res.confirm) {
+                                            wx.navigateBack({
+                                                delta: 1,
+                                            })
+                                        }
+                                    }
+                                })
+                            } else {
+                                that.showModal('抱歉，出现错误', res.result.errMsg)
+                            }
+                        },
+                        fail: err => {
+                            console.error('[云函数] [add_feedback] 调用失败', err)
+                            that.showModal('调用失败', '请检查云函数是否已部署')
+                        },
+                        complete: () => {
+                            // 重置页面数据（个人觉得更加贴近用户）
+                            // 更新：也可直接回到上一级页面
+                            // this.setData({
+                            //     content: "",
+                            //     wechatNo: "",
+                            //     email: "",
+                            //     fileID: "",
+                            //     index: 0,
+                            //     isShowPic: false
+                            // })
+                        }
+                    })
+                }
             })
         }
     },
@@ -129,7 +193,28 @@ Page({
      * Lifecycle function--Called when page load
      */
     onLoad(options) {
-
+        // 调用云函数
+        var that = this
+        wx.cloud.callFunction({
+            name: 'getSubscribeMessageTemplate',
+            data: {},
+            success: res => {
+                console.log(res)
+                if (res.result.errCode == 0) {
+                    console.log('服务器返回请求成功')
+                    that.setData({
+                        template: res.result.data.template
+                    })
+                } else {
+                    // console.log('服务器返回请求不成功，出现某种问题，需要处理')
+                    that.showModal('抱歉，出现错误', res.result.errMsg)
+                }
+            },
+            fail: err => {
+                console.error('[云函数] [getSubscribeMessageTemplate] 调用失败', err)
+                that.showModal('调用失败', '请检查云函数是否已部署')
+            }
+        })
     },
 
     /**
