@@ -10,3 +10,7 @@
 
 - [云开发文档](https://developers.weixin.qq.com/miniprogram/dev/wxcloud/basis/getting-started.html)
 
+## Sample
+
+![img](https://cdn.nlark.com/yuque/0/2023/png/23041419/1676965890869-a3194fc6-b8c4-4e05-af9f-625545a20647.png)
+
